@@ -1,0 +1,177 @@
+`first request to set cookies
+GET / HTTP/2
+Host: www.instagram.com
+Dpr: 1
+Viewport-Width: 1920
+Sec-Ch-Ua: "Chromium";v="143", "Not A(Brand";v="24"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua-Platform-Version: ""
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Full-Version-List: 
+Sec-Ch-Prefers-Color-Scheme: dark
+Accept-Language: en-US,en;q=0.9
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Sec-Fetch-Site: none
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Accept-Encoding: gzip, deflate, br
+Priority: u=0, i
+
+`second request that sets some other cookies like csrftoken (needed in post requests)`
+POST /graphql/query HTTP/2
+Host: www.instagram.com
+Content-Length: 0
+Sec-Ch-Ua-Full-Version-List: 
+Sec-Ch-Ua-Platform: "Windows"
+X-Root-Field-Name: fetch__XDTUserDict
+Sec-Ch-Ua: "Chromium";v="143", "Not A(Brand";v="24"
+Sec-Ch-Ua-Model: ""
+Cookie: ig_did=ABF28EED-87BF-4256-A6FE-F5E6576F8414; datr=CtBzad66VcaI6jYK1ykmgo_A; wd=1920x945; mid=aXPQCgALAAH3JjQ5ImjuV9o1REa6; csrftoken=JGSyC8I06fGi9GNwV7GpKg0RVtQoUfTC; ds_user_id=80062757476; sessionid=80062757476%3Ag3ikkVrpsQvHm4%3A4%3AAYizRKlS9AFa_tgwBcmnH1-ufme_CBwBD-nJ_I35GQ; ps_l=1; ps_n=1; rur="CLN\05480062757476\0541800734850:01fea1180773bfc3ba7eb7169e7299c4af8ffac776343b88ee2d96fab0161c92332fc4cd"
+Sec-Ch-Ua-Mobile: ?0
+X-Fb-Lsd: 6tHe5pMU6hZB9i9rMAlclF
+Content-Type: application/x-www-form-urlencoded
+Accept-Language: en-US,en;q=0.9
+X-Fb-Friendly-Name: PolarisUserHoverCardContentV2Query
+X-Asbd-Id: 359341
+Sec-Ch-Prefers-Color-Scheme: dark
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+Sec-Ch-Ua-Platform-Version: ""
+Accept: */*
+Origin: https://www.instagram.com
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.instagram.com/
+Accept-Encoding: gzip, deflate, br
+Priority: u=1, i
+## Cookie header auto sent if we sent requets to instagram and it responded with set-cookie header ##
+
+
+
+`request to collect first posts from an hashtag (sometimes it's 18 post per request)`
+GET /api/v1/fbsearch/web/top_serp/?enable_metadata=true&query=%23russia_vodka&search_session_id=b7cbb4db-17ed-453b-97cd-e08a35a2d5a7 HTTP/2
+Host: www.instagram.com
+Cookie: ig_did=ABF28EED-87BF-4256-A6FE-F5E6576F8414; datr=CtBzad66VcaI6jYK1ykmgo_A; wd=1920x945; mid=aXPQCgALAAH3JjQ5ImjuV9o1REa6; csrftoken=JGSyC8I06fGi9GNwV7GpKg0RVtQoUfTC; ds_user_id=80062757476; sessionid=80062757476%3Ag3ikkVrpsQvHm4%3A4%3AAYizRKlS9AFa_tgwBcmnH1-ufme_CBwBD-nJ_I35GQ; ps_l=1; ps_n=1; rur="CLN\05480062757476\0541800734847:01fe37a25bce34919c87c5a7e4927ad436aae5d4ffe4fa6b3e43f7922fc263a1ddd0af12"
+Sec-Ch-Ua-Full-Version-List: 
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Chromium";v="143", "Not A(Brand";v="24"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+X-Ig-App-Id: 936619743392459
+X-Requested-With: XMLHttpRequest
+Accept: */*
+X-Csrftoken: JGSyC8I06fGi9GNwV7GpKg0RVtQoUfTC
+X-Web-Session-Id: 4e6cqd:q8olgz:6tdhbw
+Accept-Language: en-US,en;q=0.9
+X-Asbd-Id: 359341
+Sec-Ch-Prefers-Color-Scheme: dark
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+X-Ig-Www-Claim: hmac.AR0utBlPWNxeMPxNTtuh-ugFviAok-1Ymw9J9I4izyuwjTt-
+Sec-Ch-Ua-Platform-Version: ""
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.instagram.com/explore/search/keyword/?q=%23russia_vodka
+Accept-Encoding: gzip, deflate, br
+Priority: u=1, i
+
+this request gave us 18 post, we take each post auther username and id and save it to check each one independently.
+also to get the next 18 post of the same hashtag, we need an token from the previous request response, which name is "rank_token" and "next_max_id", SAVED AT JSON["rank_token"] and JSON["next_max_id"]
+the users usernames and saved at JSON["media_grid"]["sections"][0]["layout_content"]["medias"][i]["media"]["user"]["username"] and ["id]
+you can see first hashtag response.json.
+
+the next request will change only the query to :
+GET /api/v1/fbsearch/web/top_serp/?enable_metadata=true&query=%23russia_vodka&search_session_id=&next_max_id=d088b003dd5743aaa0ee4fe26e33c57c&rank_token=eb71caad-fa9e-4ec1-b2f5-3852b464e195
+the next_max_id is from the previous response, and rank_token is from the previous response also.
+
+
+
+another way to get the users usernames and ids is by gatherinf some account followers
+GET /api/v1/friendships/61338847180/followers/?count=12&search_surface=follow_list_page HTTP/2
+Host: www.instagram.com
+Cookie: csrftoken=idwSlfqYWDHlzBun-5fhm0; datr=ldZzaZHnhTFQMhBsfPG7qcsA; ig_did=EFB5860D-9AF8-40D3-A253-455C7A2EBDAB; ig_nrcb=1; wd=1920x945; mid=aXPWlQALAAEblRmOydbYq1Zy_Bqu; ds_user_id=80062757476; sessionid=80062757476%3ApDuk1dLtTOJtR4%3A25%3AAYiCKg5cFLdr2jk0mCUP7QAIUJ7ezG3eewaNu2qC_g; rur="CLN\05480062757476\0541800742095:01fe792ab93a0c179b764eefa8c77a5e20ee096d543fd27816de9a711836a59dd986691f"
+Sec-Ch-Ua-Full-Version-List: 
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Chromium";v="143", "Not A(Brand";v="24"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+X-Ig-App-Id: 936619743392459
+X-Requested-With: XMLHttpRequest
+Accept: */*
+X-Csrftoken: idwSlfqYWDHlzBun-5fhm0
+X-Web-Session-Id: 9vdrm0:2epzvp:rxaf04
+Accept-Language: en-US,en;q=0.9
+X-Asbd-Id: 359341
+Sec-Ch-Prefers-Color-Scheme: dark
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+X-Ig-Www-Claim: hmac.AR0utBlPWNxeMPxNTtuh-ugFviAok-1Ymw9J9I4izyuwjZXC
+Sec-Ch-Ua-Platform-Version: ""
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.instagram.com/natagenius/followers/
+Accept-Encoding: gzip, deflate, br
+Priority: u=1, i
+
+this req gerts you some accounts, can be located in JSON["users"][i]["username"] and ["id"]
+i only need public accounts, can be checked by JSON["users"][i]["is_private"] == false
+*sometimes the whole resopnse only contains private accounts, so we need to be aware.
+to get the next accounts we need to use the next_max_id from the previous response. saved at JSON["next_max_id"].
+
+
+
+
+
+
+
+
+
+after getting the users usernames and ids (with any way), now we need to check each user independently.
+we will use the following 2 requests to get the user info:
+1:
+POST /api/v1/users/{user_id}/info_stream/ HTTP/2
+2:
+GET /api/v1/users/{user_id}/info/ HTTP/2
+with headers:
+Host: www.instagram.com
+Cookie: ig_did=ABF28EED-87BF-4256-A6FE-F5E6576F8414; datr=CtBzad66VcaI6jYK1ykmgo_A; wd=1920x945; mid=aXPQCgALAAH3JjQ5ImjuV9o1REa6; csrftoken=JGSyC8I06fGi9GNwV7GpKg0RVtQoUfTC; ds_user_id=80062757476; sessionid=80062757476%3Ag3ikkVrpsQvHm4%3A4%3AAYizRKlS9AFa_tgwBcmnH1-ufme_CBwBD-nJ_I35GQ; ps_l=1; ps_n=1; rur="CLN\05480062757476\0541800734847:01fe37a25bce34919c87c5a7e4927ad436aae5d4ffe4fa6b3e43f7922fc263a1ddd0af12"
+Sec-Ch-Ua-Full-Version-List: 
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Chromium";v="143", "Not A(Brand";v="24"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+X-Ig-App-Id: 936619743392459
+X-Requested-With: XMLHttpRequest
+Accept: */*
+X-Csrftoken: JGSyC8I06fGi9GNwV7GpKg0RVtQoUfTC
+X-Web-Session-Id: 4e6cqd:q8olgz:6tdhbw
+Accept-Language: en-US,en;q=0.9
+X-Asbd-Id: 359341
+Sec-Ch-Prefers-Color-Scheme: dark
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+X-Ig-Www-Claim: hmac.AR0utBlPWNxeMPxNTtuh-ugFviAok-1Ymw9J9I4izyuwjTt-
+Sec-Ch-Ua-Platform-Version: ""
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: https://www.instagram.com/explore/search/keyword/?q=%23russia_vodka
+Accept-Encoding: gzip, deflate, br
+Priority: u=1, i
+
+the response of /info/ contain the email at JSON["user"]["public_email"]
+the response of /info_stream/ contain multiple dicts in the response, the problem that the dicts are not in an array
+and not saperated by ",", so check the json file for the default instagram response to detrmine how to get into the email at JSON["user"]["public_email"]
+in the response, JSON["user"]["is_business"] == true && JSON["user"]["public_email"] -> check if the email belongs to mail.ru domain, if yes,
+check if  it's avalible to be registerd, if yes, send it in saperated message to the user in the telegram [username of account, email, avalible], if no, not avalible conut +=1.
+alos make counter for non mail.ru, and counter for errors, and counter for accounts with no business or with no email.
+the user will be asked to choose, check hashtag user, or check someone followers.
+he will send you the hashtag or the username, and he will need to send you the session id, del all the cookies and do init request with only cookie [sessionid]
+then the requests session will have set-cookie auto with the rest cookies at the responses, then you can go and grab the users ids and usernames
+do not forget to log all the things, the telegram user will only see the counters and the avalible emails that captured in the bio.
+also, the counters will be sent to the telegram as only single message, when counter update,you just update this message, not send another.
+after capture an account, send the email in a new message, send another message to show counters and update this for nex counts and so on to the rest.
+if there any details you need just ask me for a fully functional code and telegram using, make fields for the things ou will need me to fill like telegram user id and bot token.
