@@ -55,14 +55,20 @@ class MainApp:
             text = message.text.strip()
             chat_id = message.chat.id
             if self.state == AppState.WAITING_SESSION:
+                logging.info(f"Received Session ID: {text}")
                 self.session_id = text
                 try:
                     self.api = InstagramAPI(self.session_id)
                     self.state = AppState.WAITING_TARGET
                     self.telegram.bot.send_message(chat_id, "Session ID Saved.\nNow send the **Hashtag** (e.g., #cars) or **Username** (@user) to scrape.")
+                    return
                 except Exception as e:
                     self.telegram.bot.send_message(chat_id, f"Error initializing API: {e}")
-                self.target:str = text
+                    return
+            elif self.state == AppState.WAITING_TARGET:
+                self.target = text
+                if self.target == self.session_id:
+                    return
                 self.state = AppState.RUNNING
                 self.stop_event.clear()
                 self.telegram.bot.send_message(chat_id, f"Target '{self.target}' accepted. Starting job...")
@@ -118,6 +124,10 @@ class MainApp:
                     if self.stop_event.is_set(): break                
                     self.process_single_user(chat_id, user)
                     self.telegram.edit_message(chat_id, self.stats_message_id, self.format_stats())
+                    if self.stats["errors"] >= 30:
+                        self.stop_event.set()
+                        self.telegram.bot.send_message(chat_id, "🚨 Job Stopped: Too many API errors (30+).")
+                        break
                     time.sleep(1)
                 if not next_max_id:
                     self.telegram.bot.send_message(chat_id, "Job Finished (End of Pagination).")
@@ -141,6 +151,7 @@ class MainApp:
         if not email:
             self.stats["private_no_email"] += 1
             return
+        logging.info(f"Checking {username}: {email}")
         domain = email.split("@")[-1].lower()
         if "mail.ru" not in domain and "bk.ru" not in domain and "inbox.ru" not in domain and "list.ru" not in domain and "internet.ru" not in domain:
             self.stats["non_mailru"] += 1

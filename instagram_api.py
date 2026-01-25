@@ -54,6 +54,7 @@ class InstagramAPI:
             import uuid
             url += f"&search_session_id={str(uuid.uuid4())}"
         try:
+            logging.info(f"Requesting Hashtag: #{hashtag} | MaxID: {str(max_id)[:20]}")
             response = self.session.get(url, headers=self.headers, timeout=10)
             self._check_response(response)
             if response.status_code == 200:
@@ -68,6 +69,8 @@ class InstagramAPI:
                                     if user_obj.get("is_private") == True:
                                         continue   
                                     users.append({"id": user_obj.get("pk") or user_obj.get("id"),"username": user_obj.get("username")})
+                
+                logging.info(f"Hashtag #{hashtag} Scraped: Found {len(users)} users in this batch.")
                 media_grid = data.get("media_grid")
                 if media_grid:
                     next_max_id = media_grid.get("next_max_id")
@@ -86,6 +89,7 @@ class InstagramAPI:
         if max_id:
             url += f"&max_id={max_id}"
         try:
+            logging.info(f"Requesting Followers: {user_id} | MaxID: {max_id[:20] if max_id else 'None'}")
             response = self.session.get(url, headers=self.headers, timeout=10)
             self._check_response(response)
             if response.status_code == 200:
@@ -97,18 +101,22 @@ class InstagramAPI:
                         if user_obj.get("is_private") == True:
                             continue
                         users.append({"id": user_obj.get("pk") or user_obj.get("id"),"username": user_obj.get("username")})
+                logging.info(f"Followers Scraped: Found {len(users)} users in this batch.")
                 next_max_id = data.get("next_max_id")
                 if next_max_id == "":
                     next_max_id = None
                 if not next_max_id:
                      print(f"DEBUG: No next_max_id found. Keys: {list(data.keys())}")
-                print(f"DEBUG: next_max_id found: {next_max_id[:20]}")
+                if next_max_id:
+                     print(f"DEBUG: next_max_id found: {str(next_max_id)[:20]}")
+                else:
+                     print(f"DEBUG: next_max_id NONE found: {next_max_id}")
                 return users, next_max_id
             else:
                 print(f"Followers Error: {response.status_code} - {response.text[:100]}")
                 return [], None
         except Exception as e:
-            print(response.status_code,"\n",response.text[:100])
+            # print(response.status_code,"\n",response.text[:100])
             print(f"Followers Exception: {e}")
             return [], None
     def get_user_info(self, user_id):
