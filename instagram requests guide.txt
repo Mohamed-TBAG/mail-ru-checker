@@ -175,3 +175,42 @@ do not forget to log all the things, the telegram user will only see the counter
 also, the counters will be sent to the telegram as only single message, when counter update,you just update this message, not send another.
 after capture an account, send the email in a new message, send another message to show counters and update this for nex counts and so on to the rest.
 if there any details you need just ask me for a fully functional code and telegram using, make fields for the things ou will need me to fill like telegram user id and bot token.
+
+when you fiend an account with email and the email is avalible, i need you to send reset password requerst to the username of the account, and send the response to the telegram user.
+the response might be too long so just send 30 charachter.
+
+the api request is :
+"""
+POST /api/v1/web/accounts/account_recovery_send_ajax/ HTTP/2
+Host: www.instagram.com
+Content-Length: 37
+Sec-Ch-Ua-Full-Version-List: 
+Sec-Ch-Ua-Platform: "Windows"
+Sec-Ch-Ua: "Chromium";v="143", "Not A(Brand";v="24"
+Sec-Ch-Ua-Model: ""
+Sec-Ch-Ua-Mobile: ?0
+X-Requested-With: XMLHttpRequest
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+X-Csrftoken: uiY7qEIEsqsVa4l74AgyBJ
+Accept-Language: en-US,en;q=0.9
+Sec-Ch-Prefers-Color-Scheme: dark
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+X-Ig-Www-Claim: 0
+Sec-Ch-Ua-Platform-Version: ""
+Origin: https://www.instagram.com
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Accept-Encoding: gzip, deflate, br
+Priority: u=1, i
+
+email_or_username=cy.mohax&flow=fxcal
+"""
+the response:
+
+{"email_or_sms_sent":true,"message":"Thanks! Please check  m*******t@gmail.com for a link to reset your password.","status":"ok"}
+
+if the response good, i only need the "message".
+if not, send 30 char.
+also consider the csrftoken at the request headers.

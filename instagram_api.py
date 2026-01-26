@@ -34,12 +34,12 @@ class InstagramAPI:
             self.session.cookies.set("csrftoken", token, domain=".instagram.com")
             self.headers["X-Csrftoken"] = token
         except Exception as e:
-            print(f"Warning: Could not fetch CSRF token: {e}")
+            logging.error(f"Warning: Could not fetch CSRF token: {e}")
     def _check_response(self, response):
         if response.status_code == 403:
-            print(f"CRITICAL: 403 Forbidden. Invalid Session ID or Login Required for {response.url}")
+            logging.error(f"CRITICAL: 403 Forbidden. Invalid Session ID or Login Required for {response.url}")
         elif response.status_code == 429:
-            print(f"CRITICAL: 429 Too Many Requests. Pausing for 60 seconds...")
+            logging.error(f"CRITICAL: 429 Too Many Requests. Pausing for 60 seconds...")
             time.sleep(60)
         return response
     def get_hashtag_posts(self, hashtag, max_id=None, rank_token=None):
@@ -79,10 +79,11 @@ class InstagramAPI:
                     next_max_id = data.get("page_info", {}).get("end_cursor")
                 return users, next_max_id, rank_token
             else:
-                print(f"Hashtag Error: {response.status_code} - {response.text[:100]}")
+                logging.error(f"Hashtag Error: {response.status_code} - {response.text[:100]}")
                 return [], None, None
         except Exception as e:
-            print(f"Hashtag Exception: {e}")
+            logging.error(response.text[:200])
+            logging.error(f"Hashtag Exception: {e}")
             return [], None, None
     def get_user_followers(self, user_id, max_id=None):
         url = f"https://www.instagram.com/api/v1/friendships/{user_id}/followers/?count=12&search_surface=follow_list_page"
@@ -106,18 +107,18 @@ class InstagramAPI:
                 if next_max_id == "":
                     next_max_id = None
                 if not next_max_id:
-                     print(f"DEBUG: No next_max_id found. Keys: {list(data.keys())}")
+                    logging.warning(f"DEBUG: No next_max_id found. Keys: {list(data.keys())}")
                 if next_max_id:
-                     print(f"DEBUG: next_max_id found: {str(next_max_id)[:20]}")
+                    logging.info(f"DEBUG: next_max_id found: {str(next_max_id)[:20]}")
                 else:
-                     print(f"DEBUG: next_max_id NONE found: {next_max_id}")
+                    logging.warning(f"DEBUG: next_max_id NONE found: {next_max_id}")
                 return users, next_max_id
             else:
-                print(f"Followers Error: {response.status_code} - {response.text[:100]}")
+                logging.error(f"Followers Error: {response.status_code} - {response.text[:100]}")
                 return [], None
         except Exception as e:
-            # print(response.status_code,"\n",response.text[:100])
-            print(f"Followers Exception: {e}")
+            logging.error(response.status_code,"\n",response.text[:100])
+            logging.error(f"Followers Exception: {e}")
             return [], None
     def get_user_info(self, user_id):
         use_stream = True
@@ -139,7 +140,7 @@ class InstagramAPI:
                 try:
                     data = response.json()
                 except Exception as e:
-                    print(f"JSON ERROR at standard")
+                    logging.error(f"JSON ERROR at standard")
                     try:
                         with open("error_resp.txt", "w", encoding="utf-8") as f:
                             f.write(response.text)
@@ -184,3 +185,26 @@ class InstagramAPI:
         except:
             pass
         return None
+
+    def send_password_reset(self, username):
+        url = "https://www.instagram.com/api/v1/web/accounts/account_recovery_send_ajax/"
+        data = {
+            "email_or_username": username,
+            "flow": "fxcal"
+        }
+        try:
+            response = self.session.post(url, headers=self.headers, data=data, timeout=10)
+            
+            if response.status_code == 200:
+                try:
+                    resp_json = response.json()
+                    if resp_json.get("status") == "ok":
+                         return f"Reset Sent: {resp_json.get('message')}"
+                    else:
+                         return f"Reset Fail: {response.text[:30]}"
+                except:
+                     return f"Reset Fail (Parse): {response.text[:30]}"
+            else:
+                return f"Reset Error {response.status_code}: {response.text[:30]}"
+        except Exception as e:
+            return f"Reset Exception: {str(e)[:30]}"
