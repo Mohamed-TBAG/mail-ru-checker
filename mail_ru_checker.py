@@ -1,20 +1,14 @@
 import requests
 import time
 import logging
+import urllib3
 from requests.exceptions import RequestException, ConnectionError, Timeout, ReadTimeout
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler("mailru_checker.log", encoding='utf-8'),
-        logging.StreamHandler()])
+import logging
 class MailRuChecker:
-    def __init__(self, timeout=10):
-        self.session = requests.Session()
+    def __init__(self, requests_ses):
+        self.session = requests_ses
         self.session.verify = False
-        import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        self.timeout = timeout
         self.use_api_1 = True
     def check(self, email):
         try:
@@ -50,7 +44,7 @@ class MailRuChecker:
         return self.__make_request(url, params, headers, data, "API 2")
     def __make_request(self, url, params, headers, data, api_name):
         try:
-            response = self.session.post(url,params=params,headers=headers,data=data,timeout=self.timeout)
+            response = self.session.post(url,params=params,headers=headers,data=data)
             result = response.json()
             is_taken = result["body"]["exists"]
             return is_taken
